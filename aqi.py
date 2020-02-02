@@ -9,6 +9,7 @@ Created on Sun Feb  2 18:25:59 2020
 import requests
 import os
 import time
+import pandas as pd
 
 
 def get_data():
@@ -31,10 +32,15 @@ def get_data():
             with open("data/html_data/{}/{}.html".format(year, month), "wb") as output:
                 output.write(text)
 
-start_time = time.time()
-get_data()
-end_time = time.time()
-print("time consumed", end_time - start_time)
+def sampling_data():
+    df = pd.read_csv('./data/aqi_data/aqi2013.csv')
+    df['datetime'] = pd.to_datetime(df['Date']+ ' ' +df['Time'])
+    df = df.set_index('datetime')
+    df = df.drop(['Date', 'Time'], axis=1)
+    new_df = pd.to_numeric(df['PM2.5'], errors='coerce').resample('D').mean()
+    print(new_df.head())
 
-                
-            
+
+
+# get_data()
+sampling_data()
